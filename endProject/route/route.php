@@ -37,6 +37,8 @@ Route::group('api/:version/', function () {
     Route::get('user/:id/post/:page', 'api/v1.User/post');
     // 搜索话题
     Route::post('search/topic', 'api/v1.Search/topic');
+    // 搜索文章
+    Route::post('search/post', 'api/v1.Search/post');
 });
 //需要验证token
 Route::group('api/:version/', function () {

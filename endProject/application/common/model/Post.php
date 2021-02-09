@@ -78,4 +78,15 @@ class Post extends Model
             return $query->field('url');
         },'share'])->find($param['id']);
     }
+    // 根据标题搜索文章
+    public function Search()
+    {
+        // 获取所有参数
+        $param = request()->param();
+        return $this->where('title', 'like', '%'.$param['keyword'].'%')->with(['user'=>function ($query) {
+            return $query->field('id,username,userpic');
+        },'images'=>function ($query) {
+            return $query->field('url');
+        },'share'])->page($param['page'], 10)->select();
+    }
 }
