@@ -1,0 +1,294 @@
+{
+	"pages": [
+		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"app-plus": {
+					//导航栏配置
+					"titleNView": {
+						"searchInput": {
+							"backgroundColor": "#F5F4F2",
+							"borderRadius": "4px",
+							"placeholder": "搜索帖子",
+							"disabled": true,
+							"placeholderColor": "#787871"
+						},
+						"buttons": [{
+							"color": "#252525",
+							"colorPressed": "#FE5A7B",
+							"float": "right",
+							"fontSize": "20px",
+							"fontSrc": "/static/iconfont.ttf",
+							"text": "\ue668"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/news/news",
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/msg/msg",
+			"style": {
+				"navigationBarTitleText": "消息列表",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+								"color": "#252525",
+								"colorPressed": "#FE5A7B",
+								"float": "left",
+								"fontSize": "20px",
+								"fontSrc": "/static/iconfont.ttf",
+								"text": "\ue611"
+							},
+							{
+								"color": "#252525",
+								"colorPressed": "#FE5A7B",
+								"float": "right",
+								"fontSize": "20px",
+								"fontSrc": "/static/iconfont.ttf",
+								"text": "\ue649"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/search/search",
+			"style": {
+				"app-plus": {
+					//导航栏配置
+					"titleNView": {
+						"searchInput": {
+							"backgroundColor": "#F5F4F2",
+							"borderRadius": "5px",
+							"placeholder": "搜索帖子",
+							"placeholderColor": "#787871"
+						},
+						"buttons": [{
+							"color": "#252525",
+							"colorPressed": "#FE5A7B",
+							"float": "right",
+							"fontSize": "14px",
+							"text": "搜索"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/add-input/add-input",
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				},
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "components/common/upload-image",
+			"style": {}
+		}, {
+			"path": "pages/topic-nav/topic-nav",
+			"style": {
+				"navigationBarTitleText": "话题分类"
+			}
+
+		}, {
+			"path": "pages/topic-detail/topic-detail",
+			"style": {
+				"app-plus": {
+					"titleNView": {
+						"type": "transparent",
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/user-list/user-list",
+			"style": {
+				"app-plus": {
+					//导航栏配置
+					"animationType": "slide-in-left",
+					"titleNView": {
+						"autoBackButton": false,
+						"searchInput": {
+							"backgroundColor": "#F5F4F2",
+							"borderRadius": "4px",
+							"placeholder": "搜索用户",
+							"disabled": true,
+							"placeholderColor": "#787871"
+						},
+						"buttons": [{
+							"color": "#252525",
+							"colorPressed": "#FE5A7B",
+							"float": "right",
+							"fontSize": "15px",
+							"text": "取消"
+						}]
+					}
+				}
+			}
+
+		}, {
+			"path": "pages/user-chat/user-chat",
+			"style": {
+				"app-plus": {
+					"bounce": "none",
+					"titleNView": {
+						"buttons": [{
+							"color": "#252525",
+							"colorPressed": "#FE5A7B",
+							"float": "right",
+							"fontSize": "20px",
+							"fontSrc": "/static/iconfont.ttf",
+							"text": "\ue628"
+						}]
+					}
+				}
+			}
+
+		}, {
+			"path": "pages/detail/detail",
+			"style": {
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"type": "menu",
+							"float": "right"
+						}]
+					}
+				}
+			}
+
+		}, {
+			"path": "pages/user-set/user-set",
+			"style": {
+				"navigationBarTitleText": "设置"
+
+			}
+
+		}, {
+			"path": "pages/user-password/user-password",
+			"style": {
+				"navigationBarTitleText": "修改密码"
+			}
+
+		}, {
+			"path": "pages/user-email/user-email",
+			"style": {
+				"navigationBarTitleText": "绑定邮箱"
+			}
+
+		}, {
+			"path": "pages/user-userinfo/user-userinfo",
+			"style": {
+				"navigationBarTitleText": "修改资料"
+			}
+
+		}, {
+			"path": "pages/user-feedback/user-feedback",
+			"style": {
+				"navigationBarTitleText": "意见反馈"
+			}
+
+		}, {
+			"path": "pages/about/about",
+			"style": {
+				"navigationBarTitleText": "关于社区"
+			}
+
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"titleNView": false
+			}
+			}
+		    ,{
+            "path" : "pages/user-space/user-space",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "个人空间",
+                "app-plus":{
+					"titleNView":{
+						"buttons":[{
+							"type":"menu"
+						}]
+					}
+				}
+            }
+            
+        }
+    ], 
+		
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#33333",
+		"selectedColor": "#FF3333",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/index.png",
+				"selectedIconPath": "static/tabbar/indexed.png"
+			},
+			{
+				"pagePath": "pages/news/news",
+				"text": "动态",
+				"iconPath": "static/tabbar/news.png",
+				"selectedIconPath": "static/tabbar/newsed.png"
+			},
+			{
+				"pagePath": "pages/msg/msg",
+				"text": "消息",
+				"iconPath": "static/tabbar/paper.png",
+				"selectedIconPath": "static/tabbar/papered.png"
+			},
+			{
+				"pagePath": "pages/my/my",
+				"text": "我的",
+				"iconPath": "./static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/homeed.png"
+			}
+		]
+	},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [{
+			"name": "", //模式名称
+			"path": "", //启动页面，必选
+			"query": "" //启动参数，在页面的onLoad函数里面得到
+		}]
+	}
+}
