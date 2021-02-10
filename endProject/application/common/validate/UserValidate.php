@@ -35,6 +35,7 @@ class UserValidate extends BaseValidate
         'password'=>'require|alphaDash',
         'id'=>'require|integer|>:0',
         'page'=>'require|integer|>:0',
+        'email'=>'require|email',
     ];
     //配置场景
     protected $scene = [
@@ -44,5 +45,8 @@ class UserValidate extends BaseValidate
         'otherlogin'=>['provider','openid','nickName','avatarUrl','expires_in'],
         'post'=>['id','page'],
         'allpost'=>['page'],
+        'bindphone'=>['phone','code'],
+        'bindemail'=>['email'],
+        'bindother'=>['provider','openid','nickName','avatarUrl'],
     ];
 }

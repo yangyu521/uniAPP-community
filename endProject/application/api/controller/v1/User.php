@@ -65,4 +65,27 @@ class User extends BaseController
         $list = (new UserModel())->getAllPostList();
         return self::showResCode('获取成功', ['list'=>$list]);
     }
+    // 绑定手机
+    public function bindphone()
+    {
+        (new UserValidate())->goCheck('bindphone');
+        // 绑定
+        (new UserModel())->bindphone();
+        return self::showResCodeWithOutData('绑定成功');
+    }
+    // 绑定邮箱
+    public function bindemail()
+    {
+        (new UserValidate())->goCheck('bindemail');
+        // 绑定
+        (new UserModel())->bindemail();
+        return self::showResCodeWithOutData('绑定成功');
+    }
+    // 绑定第三方
+    public function bindother()
+    {
+        (new UserValidate())->goCheck('bindother');
+        (new UserModel())->bindother();
+        return self::showResCodeWithOutData('绑定成功');
+    }
 }

@@ -105,24 +105,36 @@ class User extends Model
         return true;
     }
 
-    // 判断用户是否存在（在前面课程的基础上扩充）
+    // 判断用户是否存在（补充前面课程）
     public function isExist($arr=[])
     {
         if (!is_array($arr)) {
             return false;
         }
         if (array_key_exists('phone', $arr)) { // 手机号码
-            return $this->where('phone', $arr['phone'])->find();
+            $user = $this->where('phone', $arr['phone'])->find();
+            if ($user) {
+                $user->logintype = 'phone';
+            }
+            return $user;
         }
         // 用户id
     if (array_key_exists('id', $arr)) { // 用户名
         return $this->where('id', $arr['id'])->find();
     }
         if (array_key_exists('email', $arr)) { // 邮箱
-            return $this->where('email', $arr['email'])->find();
+            $user = $this->where('email', $arr['email'])->find();
+            if ($user) {
+                $user->logintype = 'email';
+            }
+            return $user;
         }
         if (array_key_exists('username', $arr)) { // 用户名
-            return $this->where('username', $arr['username'])->find();
+            $user = $this->where('username', $arr['username'])->find();
+            if ($user) {
+                $user->logintype = 'username';
+            }
+            return $user;
         }
         // 第三方参数
         if (array_key_exists('provider', $arr)) {
@@ -130,11 +142,15 @@ class User extends Model
             'type'=>$arr['provider'],
             'openid'=>$arr['openid']
         ];
-            return $this->userbind()->where($where)->find();
+            $user = $this->userbind()->where($where)->find();
+            if ($user) {
+                $user->logintype = $arr['provider'];
+            }
+            return $user;
         }
         return false;
     }
-    // 手机登录
+    // 手机登录（补充前面课程）
     public function phoneLogin()
     {
         // 获取所有参数
@@ -145,12 +161,13 @@ class User extends Model
         if (!$user) {
             // 用户主表
             $user = self::create([
-                    'username'=>$param['phone'],
-                    'phone'=>$param['phone'],
-                     'password'=>password_hash($param['phone'], PASSWORD_DEFAULT)
-                ]);
+            'username'=>$param['phone'],
+            'phone'=>$param['phone'],
+            // 'password'=>password_hash($param['phone'],PASSWORD_DEFAULT)
+        ]);
             // 在用户信息表创建对应的记录（用户存放用户其他信息）
             $user->userinfo()->create([ 'user_id'=>$user->id ]);
+            $user->logintype = 'phone';
             return $this->CreateSaveToken($user->toArray());
         }
         // 用户是否被禁用
@@ -202,7 +219,7 @@ class User extends Model
    
 
 
-    // 第三方登录
+    // 第三方登录（补充前面课程）
     public function otherlogin()
     {
         // 获取所有参数
@@ -221,6 +238,7 @@ class User extends Model
         ]);
             $arr = $user->toArray();
             $arr['expires_in'] = $param['expires_in'];
+            $arr['logintype'] = $param['provider'];
             return $this->CreateSaveToken($arr);
         }
         // 用户是否被禁用
@@ -228,6 +246,15 @@ class User extends Model
         // 登录成功，返回token
         $arr['expires_in'] = $param['expires_in'];
         return $this->CreateSaveToken($arr);
+    }
+    // 验证当前绑定类型是否冲突
+    public function checkBindType($current, $bindtype)
+    {
+        // 当前绑定类型
+        if ($bindtype == $current) {
+            TApiException('绑定类型冲突');
+        }
+        return true;
     }
     // 验证第三方登录是否绑定手机
     public function OtherLoginIsBindPhone($user)
@@ -270,6 +297,77 @@ class User extends Model
                 return $query->field('url');
             },'share'])->where('isopen', 1)->page($params['page'], 10)->select();
     }
+    // 绑定手机
+    public function bindphone()
+    {
+        // 获取所有参数
+        $params = request()->param();
+        $currentUserInfo = request()->userTokenUserInfo;
+        $currentUserId = request()->userId;
+        // 当前登录类型
+        $currentLoginType = $currentUserInfo['logintype'];
+        // 验证绑定类型是否冲突
+        $this->checkBindType($currentLoginType, 'phone');
+        // 查询该手机是否绑定了其他用户
+        $binduser = $this->isExist(['phone'=>$params['phone']]);
+        // 存在
+        if ($binduser) {
+            // 账号邮箱登录
+            if ($currentLoginType == 'username' || $currentLoginType == 'email') {
+                TApiException('已被绑定', 20006, 200);
+            }
+            // 第三方登录
+            if ($binduser->userbind()->where('type', $currentLoginType)->find()) {
+                TApiException('已被绑定', 20006, 200);
+            }
+            // 直接修改
+            $userbind = $this->userbind()->find($currentUserInfo['id']);
+            $userbind->user_id = $binduser->id;
+            if ($userbind->save()) {
+                // 更新缓存
+                $currentUserInfo['user_id'] = $binduser->id;
+                Cache::set($currentUserInfo['token'], $currentUserInfo, $currentUserInfo['expires_in']);
+                return true;
+            }
+            TApiException();
+        }
+        // 不存在
+        // 账号邮箱登录
+        if ($currentLoginType == 'username' || $currentLoginType == 'email') {
+            $user = $this->save([
+            'phone'=>$params['phone']
+        ], ['id'=>$currentUserId]);
+            // 更新缓存
+            $currentUserInfo['phone'] = $params['phone'];
+            Cache::set($currentUserInfo['token'], $currentUserInfo, config('api.token_expire'));
+            return true;
+        }
+        // 第三方登录
+        if (!$currentUserId) {
+            // 在user表创建账号
+            $user = $this->create([
+            'username'=>$params['phone'],
+            'phone'=>$params['phone'],
+        ]);
+            // 绑定
+            $userbind = $this->userbind()->find($currentUserInfo['id']);
+            $userbind->user_id = $user->id;
+            if ($userbind->save()) {
+                // 更新缓存
+                $currentUserInfo['user_id'] = $user->id;
+                Cache::set($currentUserInfo['token'], $currentUserInfo, $currentUserInfo['expires_in']);
+                return true;
+            }
+            TApiException();
+        }
+        // 直接修改
+        if ($this->save([
+        'phone'=>$params['phone']
+    ], ['id'=>$currentUserId])) {
+            return true;
+        }
+        TApiException();
+    }
     // 获取指定用户下所有文章
     public function getAllPostList()
     {
@@ -282,5 +380,113 @@ class User extends Model
         },'images'=>function ($query) {
             return $query->field('url');
         },'share'])->page($params['page'], 10)->select();
+    }
+    // 搜索用户
+    public function Search()
+    {
+        // 获取所有参数
+        $param = request()->param();
+        return $this->where('username', 'like', '%'.$param['keyword'].'%')->page($param['page'], 10)->hidden(['password'])->select();
+    }
+    // 绑定邮箱
+    public function bindemail()
+    {
+        // 获取所有参数
+        $params = request()->param();
+        $currentUserInfo = request()->userTokenUserInfo;
+        $currentUserId = request()->userId;
+        // 当前登录类型
+        $currentLoginType = $currentUserInfo['logintype'];
+        // 验证绑定类型是否冲突
+        $this->checkBindType($currentLoginType, 'email');
+        // 查询该手机是否绑定了其他用户
+        $binduser = $this->isExist(['email'=>$params['email']]);
+        // 存在
+        if ($binduser) {
+            // 账号手机登录
+            if ($currentLoginType == 'username' || $currentLoginType == 'phone') {
+                TApiException('已被绑定', 20006, 200);
+            }
+            // 第三方登录
+            if ($binduser->userbind()->where('type', $currentLoginType)->find()) {
+                TApiException('已被绑定', 20006, 200);
+            }
+            // 直接修改
+            $userbind = $this->userbind()->find($currentUserInfo['id']);
+            $userbind->user_id = $binduser->id;
+            if ($userbind->save()) {
+                // 更新缓存
+                $currentUserInfo['user_id'] = $binduser->id;
+                Cache::set($currentUserInfo['token'], $currentUserInfo, $currentUserInfo['expires_in']);
+                return true;
+            }
+            TApiException();
+        }
+        // 不存在
+        // 账号手机登录
+        if ($currentLoginType == 'username' || $currentLoginType == 'phone') {
+            $user = $this->save([
+            'email'=>$params['email']
+        ], ['id'=>$currentUserId]);
+            // 更新缓存
+            $currentUserInfo['email'] = $params['email'];
+            Cache::set($currentUserInfo['token'], $currentUserInfo, config('api.token_expire'));
+            return true;
+        }
+        // 第三方登录
+        if (!$currentUserId) {
+            // 在user表创建账号
+            $user = $this->create([
+            'username'=>$params['email'],
+            'email'=>$params['email'],
+        ]);
+            // 绑定
+            $userbind = $this->userbind()->find($currentUserInfo['id']);
+            $userbind->user_id = $user->id;
+            if ($userbind->save()) {
+                // 更新缓存
+                $currentUserInfo['user_id'] = $user->id;
+                Cache::set($currentUserInfo['token'], $currentUserInfo, $currentUserInfo['expires_in']);
+                return true;
+            }
+            TApiException();
+        }
+        // 直接修改
+        if ($this->save([
+        'email'=>$params['email']
+    ], ['id'=>$currentUserId])) {
+            return true;
+        }
+        TApiException();
+    }
+    // 绑定第三方登录
+    public function bindother()
+    {
+        // 获取所有参数
+        $params = request()->param();
+        $currentUserInfo = request()->userTokenUserInfo;
+        $currentUserId = request()->userId;
+        // 当前登录类型
+        $currentLoginType = $currentUserInfo['logintype'];
+        // 验证绑定类型是否冲突
+        $this->checkBindType($currentLoginType, $params['provider']);
+        // 查询该手机是否绑定了其他用户
+        $binduser = $this->isExist(['provider'=>$params['provider'],'openid'=>$params['openid']]);
+        // 存在
+        if ($binduser) {
+            if ($binduser->user_id) {
+                TApiException('已被绑定', 20006, 200);
+            }
+            $binduser->user_id = $currentUserId;
+            return $binduser->save();
+        }
+        // 不存在
+        return $this->userbind()->create([
+        'type'=>$params['provider'],
+        'openid'=>$params['openid'],
+        'nickname'=>$params['nickName'],
+        'avatarurl'=>$params['avatarUrl'],
+        'user_id'=>$currentUserId
+    ]);
     }
 }

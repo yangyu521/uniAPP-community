@@ -13,7 +13,11 @@ class Post extends Model
     {
         return $this->belongsToMany('Image', 'post_image');
     }
-
+    //关联顶踩表
+    public function support()
+    {
+        return $this->belongsToMany('Image', 'post_image');
+    }
     // 发布文章
     public function createPost()
     {

@@ -16,17 +16,22 @@ class PostClass extends Model
     {
         return $this->hasMany('Post');
     }
-
+   
     // 获取指定分类下的文章（分页）
     public function getPost()
     {
         // 获取所有参数
         $param = request()->param();
+        //当前用户id
+        $userId =request()->userId ? request()->userId : 0;
+        $userId = 13;
         return self::get($param['id'])->post()->with([
         'user'=>function ($query) {
             return $query->field('id,username,userpic');
         },'images'=>function ($query) {
             return $query->field('url');
-        },'share'])->page($param['page'], 10)->select();
+        },'share','support'=>function ($query) use ($userId) {
+            return $query->where('user_id', $userId);
+        }])->page($param['page'], 10)->select();
     }
 }

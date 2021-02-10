@@ -32,19 +32,25 @@ Route::group('api/:version/', function () {
     // 获取指定话题下的文章列表
     Route::get('topic/:id/post/:page', 'api/v1.Topic/post');
     // 获取指定文章分类下的文章
-    Route::get('postclass/:id/post/:page', 'api/v1.PostClass/post');
+    Route::get('postclass/:id/post/:page', 'api/v1.PostClass/post')->middleware('ApiGetUserid');
     // 获取指定用户下的文章
     Route::get('user/:id/post/:page', 'api/v1.User/post');
     // 搜索话题
     Route::post('search/topic', 'api/v1.Search/topic');
     // 搜索文章
     Route::post('search/post', 'api/v1.Search/post');
+    // 搜索用户
+    Route::post('search/user', 'api/v1.Search/user');
+    // 广告列表
+    Route::get('adsense/:type', 'api/v1.Adsense/index');
 });
 //需要验证token
 Route::group('api/:version/', function () {
     //退出登录
     Route::post('user/logout', 'api/:version.User/logout');
-})->middleware(['ApiUserAuth','ApiUserBindPhone','ApiUserStatus']);
+    // 绑定手机
+    Route::post('user/bindphone', 'api/v1.User/bindphone');
+})->middleware(['ApiUserAuth']);
 
 // 用户操作（绑定手机）
 Route::group('api/:v1/', function () {
@@ -54,4 +60,10 @@ Route::group('api/:v1/', function () {
     Route::post('post/create', 'api/v1.Post/create');
     // 获取指定用户下的所有文章（含隐私）
     Route::get('user/post/:page', 'api/v1.User/Allpost');
+    // 绑定邮箱
+    Route::post('user/bindemail', 'api/v1.User/bindemail');
+    // 绑定第三方
+    Route::post('user/bindother', 'api/v1.User/bindother');
+    // 用户顶踩
+    Route::post('support', 'api/v1.Support/index');
 })->middleware(['ApiUserAuth','ApiUserBindPhone','ApiUserStatus']);
