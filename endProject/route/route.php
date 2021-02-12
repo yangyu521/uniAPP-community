@@ -45,6 +45,8 @@ Route::group('api/:version/', function () {
     Route::get('adsense/:type', 'api/v1.Adsense/index');
     // 获取当前文章的所有评论
     Route::get('post/:id/comment', 'api/v1.Post/comment');
+     // 检测更新
+     Route::post('update','api/v1.Update/update');
 });
 //需要验证token
 Route::group('api/:version/', function () {
@@ -76,4 +78,22 @@ Route::group('api/:v1/', function () {
     Route::post('edituserinfo', 'api/v1.User/editinfo');
     // 修改密码
     Route::post('repassword', 'api/v1.User/rePassword');
+    // 加入黑名单
+    Route::post('addblack', 'api/:v1.Blacklist/addBlack');
+    // 移出黑名单
+    Route::post('removeblack', 'api/:v1.Blacklist/removeBlack');
+    // 关注
+    Route::post('follow', 'api/v1.User/follow');
+    // 取消关注
+    Route::post('unfollow', 'api/v1.User/unfollow');
+    // 互关列表
+    Route::get('friends/:page', 'api/v1.User/friends');
+    // 粉丝列表
+    Route::get('fens/:page', 'api/v1.User/fens');
+    // 关注列表
+    Route::get('follows/:page', 'api/v1.User/follows');
+    // 用户反馈
+    Route::post('feedback', 'api/:v1.Feedback/feedback');
+    // 获取用户反馈列表
+    Route::get('feedbacklist/:page', 'api/:v1.Feedback/feedbacklist');
 })->middleware(['ApiUserAuth','ApiUserBindPhone','ApiUserStatus']);

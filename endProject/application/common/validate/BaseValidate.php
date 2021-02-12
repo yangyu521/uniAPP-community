@@ -73,4 +73,20 @@ class BaseValidate extends Validate
         }
         return "回复的评论已不存在";
     }
+    // 用户是否存在
+    protected function isUserExist($value, $rule='', $data='', $field='')
+    {
+        if (\app\common\model\User::field('id')->find($value)) {
+            return true;
+        }
+        return "该用户已不存在";
+    }
+    // 不能为空
+    protected function NotEmpty($value, $rule='', $data='', $field='')
+    {
+        if (empty($value)) {
+            return $field."不能为空";
+        }
+        return true;
+    }
 }

@@ -46,6 +46,7 @@ class UserValidate extends BaseValidate
         'oldpassword'=>'require',
         'newpassword'=>'require|alphaDash',
         'renewpassword'=>'require|confirm:newpassword',
+        'follow_id'=>'require|integer|>:0|isUserExist'
     ];
     //配置场景
     protected $scene = [
@@ -61,5 +62,10 @@ class UserValidate extends BaseValidate
         'edituserpic'=>['userpic'],
         'edituserinfo'=>['name','sex','qg','job','birthday','path'],
         'repassword'=>['oldpassword','newpassword','renewpassword'],
+        'follow'=>['follow_id'],
+        'unfollow'=>['follow_id'],
+        'getfriends'=>['page'],
+        'getfens'=>['page'],
+        'getfollows'=>['page'],
     ];
 }
