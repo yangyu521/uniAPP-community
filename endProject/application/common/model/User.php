@@ -489,4 +489,66 @@ class User extends Model
         'user_id'=>$currentUserId
     ]);
     }
+    //  修改头像
+    public function editUserpic()
+    {
+        // 获取所有参数
+        $params = request()->param();
+        // 获取用户id
+        $userid=request()->userId;
+        $image = (new Image())->upload($userid, 'userpic');
+        // 修改用户头像
+        $user = self::get($userid);
+        $user->userpic = getFileUrl($image->url);
+        if ($user->save()) {
+            return true;
+        }
+        TApiException();
+    }
+    // 修改资料
+    public function editUserinfo()
+    {
+        // 获取所有参数
+        $params = request()->param();
+        // 获取用户id
+        $userid=request()->userId;
+        // 修改昵称
+        $user = $this->get($userid);
+        $user->username = $params['name'];
+        $user->save();
+        // 修改用户信息表
+        $userinfo = $user->userinfo()->find();
+        $userinfo->sex = $params['sex'];
+        $userinfo->qg = $params['qg'];
+        $userinfo->job = $params['job'];
+        $userinfo->birthday = $params['birthday'];
+        $userinfo->path = $params['path'];
+        $userinfo->save();
+        return true;
+    }
+    // 修改密码
+    public function repassword()
+    {
+        // 获取所有参数
+        $params = request()->param();
+        // 获取用户id
+        $userid = request()->userId;
+        $user = self::get($userid);
+        // 手机注册的用户并没有原密码,直接修改即可
+        if ($user['password']) {
+            // 判断旧密码是否正确
+            $this->checkPassword($params['oldpassword'], $user['password']);
+        }
+        // 修改密码
+        $newpassword = password_hash($params['newpassword'], PASSWORD_DEFAULT);
+        $res = $this->save([
+        'password'=>$newpassword
+    ], ['id'=>$userid]);
+        if (!$res) {
+            TApiException('修改密码失败', 20009, 200);
+        }
+        $user['password'] = $newpassword;
+        // 更新缓存信息
+        Cache::set(request()->Token, $user, config('api.token_expire'));
+    }
 }

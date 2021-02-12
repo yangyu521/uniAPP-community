@@ -36,6 +36,16 @@ class UserValidate extends BaseValidate
         'id'=>'require|integer|>:0',
         'page'=>'require|integer|>:0',
         'email'=>'require|email',
+        'userpic'=>'image',
+        'name'=>'require|chsDash',
+        'sex'=>'require|in:0,1,2',
+        'qg'=>'require|in:0,1,2',
+        'job'=>'require|chsAlpha',
+        'birthday'=>'require|dateFormat:Y-m-d',
+        'path'=>'require|chsDash',
+        'oldpassword'=>'require',
+        'newpassword'=>'require|alphaDash',
+        'renewpassword'=>'require|confirm:newpassword',
     ];
     //配置场景
     protected $scene = [
@@ -48,5 +58,8 @@ class UserValidate extends BaseValidate
         'bindphone'=>['phone','code'],
         'bindemail'=>['email'],
         'bindother'=>['provider','openid','nickName','avatarUrl'],
+        'edituserpic'=>['userpic'],
+        'edituserinfo'=>['name','sex','qg','job','birthday','path'],
+        'repassword'=>['oldpassword','newpassword','renewpassword'],
     ];
 }
